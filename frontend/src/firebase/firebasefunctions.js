@@ -16,8 +16,9 @@ import {
   where,
 } from "firebase/firestore";
 
-import bcrypt from 'bcryptjs'
+import bcrypt from "bcryptjs";
 import CryptoJS from "crypto-js";
+
 const db = getFirestore();
 const auth = getAuth();
 
@@ -83,9 +84,9 @@ export const logOut = () => {
 //   }
 // };
 
-     // Import bcrypt for password hashing
+// Import bcrypt for password hashing
 
-const secretKey = 'your-secret-key'; 
+const secretKey = "your-secret-key";
 
 export const initializeUser = async (email, password, username, role, uid) => {
   try {
@@ -94,14 +95,17 @@ export const initializeUser = async (email, password, username, role, uid) => {
 
     // Encrypt sensitive data using AES encryption
     const encryptedEmail = CryptoJS.AES.encrypt(email, secretKey).toString();
-    const encryptedUsername = CryptoJS.AES.encrypt(username, secretKey).toString();
+    const encryptedUsername = CryptoJS.AES.encrypt(
+      username,
+      secretKey
+    ).toString();
 
     // Store the encrypted and hashed data in Firestore
     const docRef = await setDoc(doc(db, "users", uid), {
-      email: encryptedEmail,            // Store the encrypted email
-      password: hashedPassword,         // Store the hashed password
-      username: encryptedUsername,      // Store the encrypted username
-      role: role,                       // Store the role (no need for encryption here if it's not sensitive)
+      email: encryptedEmail, // Store the encrypted email
+      password: hashedPassword, // Store the hashed password
+      username: encryptedUsername, // Store the encrypted username
+      role: role, // Store the role (no need for encryption here if it's not sensitive)
     });
 
     console.log("Document written with ID: ", docRef.id);
@@ -112,13 +116,13 @@ export const initializeUser = async (email, password, username, role, uid) => {
 
 export const decryptData = (encryptedData) => {
   const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-  const originalData = bytes.toString(CryptoJS.enc.Utf8);  // Convert to UTF-8 string
+  const originalData = bytes.toString(CryptoJS.enc.Utf8); // Convert to UTF-8 string
   return originalData;
 };
 
 export const fetchUserData = async (uid) => {
   try {
-    const docRef = doc(db, "users", uid );
+    const docRef = doc(db, "users", uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
