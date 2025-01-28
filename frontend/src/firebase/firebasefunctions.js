@@ -88,11 +88,11 @@ export const logOut = () => {
 
 const secretKey = "your-secret-key";
 
-export const encrypt = (word)=>{
+export const encrypt = (word) => {
   const encryptedWord = CryptoJS.AES.encrypt(word, secretKey).toString();
 
   return encryptedWord;
-}
+};
 
 export const initializeUser = async (email, password, username, role, uid) => {
   try {

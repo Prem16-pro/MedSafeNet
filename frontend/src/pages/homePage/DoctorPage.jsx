@@ -8,14 +8,16 @@ import {
   PrescribePatient,
 } from "../../firebase/firebasefunctions";
 import { useSelector } from "react-redux";
-import "../../styles/DoctorPage.css"; // External CSS for styling
+import "../../styles/DoctorPage.css";
 
 export const DoctorPage = () => {
   const [listPatients, setListPatients] = useState(true);
   const [viewPatient, setViewPatient] = useState("");
 
   if (viewPatient !== "") {
-    return <ViewPatient patientId={viewPatient} />;
+    return (
+      <ViewPatient patientId={viewPatient} setViewPatient={setViewPatient} />
+    );
   }
 
   return (
@@ -38,6 +40,24 @@ export const DoctorPage = () => {
     </div>
   );
 };
+
+function calculateAge(dob) {
+  const birthDate = new Date(dob);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+
+  // If the birthday hasn't occurred yet this year, subtract 1 from the age
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
 
 const PatientList = ({ setViewPatient }) => {
   const user = useSelector((state) => state.auth.user);
@@ -72,17 +92,27 @@ const PatientList = ({ setViewPatient }) => {
     <div className="patient-list">
       <h2>Patient List</h2>
       {list.length > 0 ? (
-        list.map((item, i) => (
-          <div key={i} className="patient-item">
-            <p>{item.name}</p>
-            <button
-              onClick={() => setViewPatient(item.id)}
-              className="view-btn"
-            >
-              View
-            </button>
-          </div>
-        ))
+        list.map(
+          (item, i) => (
+            console.log(item),
+            (
+              <div key={i} className="patient-item">
+                <p>
+                  {item.name}{" "}
+                  <b>
+                    ({calculateAge(item.dob)} - {item.gender})
+                  </b>
+                </p>
+                <button
+                  onClick={() => setViewPatient(item.id)}
+                  className="view-btn"
+                >
+                  View Patient Details
+                </button>
+              </div>
+            )
+          )
+        )
       ) : (
         <div>No patients found.</div>
       )}
@@ -148,7 +178,7 @@ const AddNewPatient = () => {
   );
 };
 
-const ViewPatient = ({ patientId }) => {
+const ViewPatient = ({ patientId, setViewPatient }) => {
   const [prescription, setPrescription] = useState("");
   const [previousPrescriptions, setPreviousPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -207,15 +237,27 @@ const ViewPatient = ({ patientId }) => {
       ) : error ? (
         <div>{error}</div>
       ) : (
-        <ul>
+        <div className="previous-prescriptions-list">
           {previousPrescriptions.length > 0 ? (
             previousPrescriptions.map((prescription, index) => (
-              <li key={index}>{prescription}</li>
+              <div key={index}>
+                <b>{index + 1}. </b>
+                {prescription}
+              </div>
             ))
           ) : (
             <p>No prescriptions found for this patient.</p>
           )}
-        </ul>
+        </div>
+        // <ul className="previous-prescriptions-list">
+        //   {previousPrescriptions.length > 0 ? (
+        //     previousPrescriptions.map((prescription, index) => (
+        //       <li key={index}>{prescription}</li>
+        //     ))
+        //   ) : (
+        //     <p>No prescriptions found for this patient.</p>
+        //   )}
+        // </ul>
       )}
 
       <input
@@ -224,9 +266,20 @@ const ViewPatient = ({ patientId }) => {
         onChange={(e) => setPrescription(e.target.value)}
         className="input-field"
       />
-      <button onClick={handlePrescribe} className="action-btn">
-        Prescribe
-      </button>
+      <div className="previous-prescriptions-btn-container">
+        <button
+          onClick={handlePrescribe}
+          className="previous-prescriptions-btn"
+        >
+          Prescribe
+        </button>
+        <button
+          onClick={() => setViewPatient("")}
+          className="previous-prescriptions-btn"
+        >
+          Close
+        </button>
+      </div>
     </div>
   );
 };
