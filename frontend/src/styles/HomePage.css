@@ -1,0 +1,52 @@
+/* HomePage.css */
+
+/* Main container */
+.home-page {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+    background-color: #f4f7fc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Title */
+  .home-page h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  /* Sign out button styling */
+  .sign-out-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 15%  ;
+  }
+  
+  .sign-out-btn:hover {
+    background-color: #e53935;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .home-page {
+      padding: 15px;
+    }
+  
+    .home-page h1 {
+      font-size: 20px;
+    }
+  
+    .sign-out-btn {
+      font-size: 14px;
+    }
+  }
+  
