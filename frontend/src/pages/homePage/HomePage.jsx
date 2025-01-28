@@ -11,8 +11,8 @@ export const HomePage = () => {
   const role = user.role;
   return (
     <>
-      {role === "doctor" ? <DoctorPage /> : <PatientPage />}
       <button onClick={handleSignOut}>Sign Out</button>
+      {role === "doctor" ? <DoctorPage /> : <PatientPage />}
     </>
   );
 };
