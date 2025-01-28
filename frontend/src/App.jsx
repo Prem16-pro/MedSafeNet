@@ -1,27 +1,37 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import { useDispatch, useSelector } from "react-redux";
-import { decrement, increment, incrementByAmount } from "./redux/counterSlice";
-import { login } from "./redux/authSlice";
+
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import { app } from './firebase/firebase'
+import { AuthPages } from './pages/authPages/authPages'
+import React, { useEffect } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { HomePage } from './pages/homePage/HomePage'
 
 function App() {
-  // const count = useSelector((state) => state.counter.value);
-  const user = useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
-  console.log(user);
+  const [user, setUser] = useState(null);
+  const auth = getAuth();
 
-  function setUser() {
-    dispatch(login("AryanBSDk"));
-  }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // User is signed in.
+        setUser(currentUser);
+      } else {
+        // No user is signed in.
+        setUser(null);
+      }
+    });
 
-  return (
-    <div>
-      User : {user}
-      <button onClick={setUser}>Sign in</button>
-    </div>
-  );
+    // Cleanup the listener on component unmount.
+    return () => unsubscribe();
+  }, [auth]);
+  console.log(app)
+  return(<>
+    {user ? <HomePage/>: <AuthPages/> }
+    {/* <AuthPages/> */}
+  </>)
 }
 
 export default App;
