@@ -7,20 +7,34 @@ import { HomePage } from "./pages/homePage/HomePage";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "./redux/authSlice";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { fetchUserData } from "./firebase/firebasefunctions";
 
 function App() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const auth = getAuth();
-  console.log(user)
+  console.log(user);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         // Store only serializable data (uid, email)
-        dispatch(login({
-          uid: currentUser.uid,
-          email: currentUser.email,
-        }));
+
+        const temp = async()=>{
+          const data = await fetchUserData(currentUser.uid);
+          console.log(data);
+
+          dispatch(
+            login({
+              uid: currentUser.uid,
+              email: data.email,
+              username: data.username,
+              role: data.role
+            })
+          );
+        }
+        temp();
+
+
       } else {
         dispatch(login(null));
       }
@@ -29,11 +43,7 @@ function App() {
     return () => unsubscribe();
   }, [auth, dispatch]);
 
-  return (
-    <>
-      {user ? <HomePage /> : <AuthPages />}
-    </>
-  );
+  return <>{user ? <HomePage /> : <AuthPages />}</>;
 }
 
 export default App;

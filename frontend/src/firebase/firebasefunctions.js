@@ -9,6 +9,7 @@ import {
   collection,
   addDoc,
   setDoc,
+  getDoc,
   doc,
 } from "firebase/firestore";
 
@@ -76,3 +77,23 @@ const intializeUser = async (email, password, username, role, uid) => {
     console.error("Error adding document: ", e);
   }
 };
+
+export const fetchUserData = async (uid) => {
+  try {
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // If the document exists, we return the data
+      // console.log("User data:", docSnap.data());
+      return docSnap.data();
+    } else {
+      // No such document!
+      console.log("No user data found!");
+      return null;
+    }
+  } catch (e) {
+    console.error("Error fetching user data: ", e);
+    return null;
+  }
+}
