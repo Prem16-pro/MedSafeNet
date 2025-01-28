@@ -96,4 +96,4 @@ export const fetchUserData = async (uid) => {
     console.error("Error fetching user data: ", e);
     return null;
   }
-}
+};
