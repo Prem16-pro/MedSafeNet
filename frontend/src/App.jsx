@@ -7,7 +7,8 @@ import { HomePage } from "./pages/homePage/HomePage";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "./redux/authSlice";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { fetchUserData } from "./firebase/firebasefunctions";
+import { decryptData, fetchUserData } from "./firebase/firebasefunctions";
+import AESExample from "./encrypt/AESExample";
 
 function App() {
   const user = useSelector((state) => state.auth.user);
@@ -26,8 +27,8 @@ function App() {
           dispatch(
             login({
               uid: currentUser.uid,
-              email: data.email,
-              username: data.username,
+              email: decryptData(data.email),
+              username: decryptData(data.username),
               role: data.role
             })
           );

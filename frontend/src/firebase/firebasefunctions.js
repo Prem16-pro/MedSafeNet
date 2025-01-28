@@ -13,6 +13,8 @@ import {
   doc,
 } from "firebase/firestore";
 
+import bcrypt from 'bcryptjs'
+import CryptoJS from "crypto-js";
 const db = getFirestore();
 const auth = getAuth();
 
@@ -24,7 +26,7 @@ export const createUser = (email, password, username, role) => {
       console.log("User created successfully");
       console.log(user);
       console.log(user.uid);
-      intializeUser(email, password, username, role, user.uid);
+      initializeUser(email, password, username, role, user.uid);
       // ...
     })
     .catch((error) => {
@@ -64,23 +66,56 @@ export const logOut = () => {
     });
 };
 
-const intializeUser = async (email, password, username, role, uid) => {
+// const intializeUser = async (email, password, username, role, uid) => {
+//   try {
+//     const docRef = await setDoc(doc(db, "users", uid), {
+//       email: email,
+//       password: password,
+//       username: username,
+//       role: role,
+//     });
+//     console.log("Document written with ID: ", docRef.id);
+//   } catch (e) {
+//     console.error("Error adding document: ", e);
+//   }
+// };
+
+     // Import bcrypt for password hashing
+
+const secretKey = 'your-secret-key'; 
+
+export const initializeUser = async (email, password, username, role, uid) => {
   try {
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Encrypt sensitive data using AES encryption
+    const encryptedEmail = CryptoJS.AES.encrypt(email, secretKey).toString();
+    const encryptedUsername = CryptoJS.AES.encrypt(username, secretKey).toString();
+
+    // Store the encrypted and hashed data in Firestore
     const docRef = await setDoc(doc(db, "users", uid), {
-      email: email,
-      password: password,
-      username: username,
-      role: role,
+      email: encryptedEmail,            // Store the encrypted email
+      password: hashedPassword,         // Store the hashed password
+      username: encryptedUsername,      // Store the encrypted username
+      role: role,                       // Store the role (no need for encryption here if it's not sensitive)
     });
+
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 };
 
+export const decryptData = (encryptedData) => {
+  const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+  const originalData = bytes.toString(CryptoJS.enc.Utf8);  // Convert to UTF-8 string
+  return originalData;
+};
+
 export const fetchUserData = async (uid) => {
   try {
-    const docRef = doc(db, "users", uid);
+    const docRef = doc(db, "users", uid );
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
